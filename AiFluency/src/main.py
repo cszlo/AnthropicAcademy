@@ -3,6 +3,7 @@ import sys
 
 from diff_extractor import extract_pr_files
 from reviewer import review_files
+from poster import post_review
 
 
 def main():
@@ -46,7 +47,7 @@ def main():
         print(f"  [{c['type']}] {c['filename']}:{c['line']}")
         print(f"    {c['body'][:120]}...")
 
-    # Task 4: post inline review comments via GitHub API
+    post_review(github_token, repository, pr_number, comments)
 
 
 if __name__ == "__main__":
