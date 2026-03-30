@@ -1,0 +1,30 @@
+name: AI Code Reviewer
+description: Analyzes PR changes using Claude and posts inline review comments with rename suggestions, readability rewrites, and a vulnerability report.
+
+inputs:
+  github_token:
+    description: GitHub token for API access (use secrets.GITHUB_TOKEN)
+    required: true
+  anthropic_api_key:
+    description: Anthropic API key for Claude
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r ${{ github.action_path }}/src/requirements.txt
+
+    - name: Run AI Code Reviewer
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic_api_key }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: python ${{ github.action_path }}/src/main.py
