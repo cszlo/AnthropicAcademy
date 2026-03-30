@@ -99,3 +99,6 @@ You own the framing and what to highlight for a portfolio audience. Claude draft
 | 5. Testing | Collaborative (you own fixtures) |
 | 6. Agentic follow-up loop | Mostly AI |
 | 7. README / documentation | Collaborative |
+
+
+I just need a change for testing.
