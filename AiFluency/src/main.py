@@ -2,6 +2,7 @@ import os
 import sys
 
 from diff_extractor import extract_pr_files
+from reviewer import review_files
 
 
 def main():
@@ -38,7 +39,13 @@ def main():
         elif mode == "removed":
             print(f"  [{mode}] {filename}")
 
-    # Task 3: analyze with Claude, infer intent, suggest renames/rewrites, flag vulnerabilities
+    comments = review_files(anthropic_api_key, files)
+
+    print(f"\nClaude produced {len(comments)} comment(s):")
+    for c in comments:
+        print(f"  [{c['type']}] {c['filename']}:{c['line']}")
+        print(f"    {c['body'][:120]}...")
+
     # Task 4: post inline review comments via GitHub API
 
 
