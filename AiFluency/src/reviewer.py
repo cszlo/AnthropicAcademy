@@ -86,7 +86,7 @@ def review_files(anthropic_api_key, files):
 
         response = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=1024,
+            max_tokens=4096,
             system=SYSTEM_PROMPT,
             tools=[REVIEW_TOOL],
             tool_choice={"type": "tool", "name": "submit_review_comments"},
@@ -95,6 +95,8 @@ def review_files(anthropic_api_key, files):
 
         for block in response.content:
             if block.type == "tool_use" and block.name == "submit_review_comments":
-                all_comments.extend(block.input.get("comments", []))
+                comments = block.input.get("comments", [])
+                print(f"  {file_data['filename']}: {len(comments)} comment(s) from Claude")
+                all_comments.extend(comments)
 
     return all_comments
