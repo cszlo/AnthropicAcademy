@@ -70,4 +70,3 @@
 - Deciding what work is to be done by who
 - Know eachothers strengths/weakness
 - Most effective collaborators are expertes in their field first
-- 
