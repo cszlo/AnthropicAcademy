@@ -10,12 +10,19 @@ def add_assistant_message(messages, text):
     assistant_message = {"role": "assistant", "content": text}
     messages.append(assistant_message)
 
-def chat(messages):
-    message = client.messages.create(
-        model=model,
-        max_tokens=1000,
-        messages=messages
-    )
+def chat(messages, system=None, temperature=None):
+
+    params = {
+        "model": model,
+        "max_tokens": 1000,
+        "messages": messages,
+        "temperature": temperature
+    }
+
+    if system:
+        params["system"] = system
+
+    message = client.messages.create(**params)
     return message.content[0].text
 
 
@@ -29,22 +36,33 @@ if __name__ == '__main__':
     load_dotenv()
     client = Anthropic()
     model = "claude-sonnet-4-0"
+    temperature = 0.0
     messages = []
 
-    # Prepare, send and capture a request to Anthropic API.
-    add_user_message(messages, "Tell me about agentic AI in 2-3 sentences.")
-    answer = chat(messages)
+    print(">> Provide a system prompt (or not). Example: 'You are a patient math tutor. Do not directly answer a student's questions. Guide them to a solution step by step.'")
+    system = input("> ")
 
-    # Print response
-    print(answer)
+    print("Preparing Chat bot...")
+    print("Send 'exit' to quit session.")
 
-    # Prepare, send and capture a follow-up request to Anthropic API.
-    add_assistant_message(messages, answer)
-    add_user_message(messages, "How long has it been around?")
-    answer = chat(messages)
+    while True:
+        user_input = input("> ")
+        if user_input.lower() == 'exit':
+            print(">> Goodbye!")
+            break
 
-    # Print response
-    print(answer)
+        # Prepare, send and capture a request to Anthropic API.
+        add_user_message(messages, user_input)
+        answer = chat(messages, system, temperature)
+
+        # Add assistant response to conversation history.
+        add_assistant_message(messages, answer)
+
+        # Print response
+        print(">> ", answer)
+
+
+
 
 
 
