@@ -10,20 +10,24 @@ def add_assistant_message(messages, text):
     assistant_message = {"role": "assistant", "content": text}
     messages.append(assistant_message)
 
-def chat(messages, system=None, temperature=None):
+def chat(messages, system=None, temperature=None, stream=True):
 
     params = {
         "model": model,
         "max_tokens": 1000,
         "messages": messages,
-        "temperature": temperature
+        "temperature": temperature,
+        "stream": stream
     }
 
     if system:
         params["system"] = system
 
-    message = client.messages.create(**params)
-    return message.content[0].text
+    stream = client.messages.create(**params)
+    # Print response
+    for event in stream:
+        if event.delta.text:
+            print(event.delta.text)
 
 
 # When working with the Anthropic API and Claude, there's a crucial concept
@@ -36,7 +40,7 @@ if __name__ == '__main__':
     load_dotenv()
     client = Anthropic()
     model = "claude-sonnet-4-0"
-    temperature = 0.0
+    temperature = 1.0
     messages = []
 
     print(">> Provide a system prompt (or not). Example: 'You are a patient math tutor. Do not directly answer a student's questions. Guide them to a solution step by step.'")
@@ -46,6 +50,7 @@ if __name__ == '__main__':
     print("Send 'exit' to quit session.")
 
     while True:
+        print()
         user_input = input("> ")
         if user_input.lower() == 'exit':
             print(">> Goodbye!")
@@ -53,13 +58,22 @@ if __name__ == '__main__':
 
         # Prepare, send and capture a request to Anthropic API.
         add_user_message(messages, user_input)
-        answer = chat(messages, system, temperature)
+
+        with client.messages.stream(
+                model=model,
+                max_tokens=1000,
+                messages=messages,
+        ) as stream:
+            for text in stream.text_stream:
+                print(text, end="")
+                pass
+
+        # stream.get_final_message())
 
         # Add assistant response to conversation history.
-        add_assistant_message(messages, answer)
+        # add_assistant_message(messages, stream.get_final_message())
 
-        # Print response
-        print(">> ", answer)
+
 
 
 
